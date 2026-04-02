@@ -6,6 +6,7 @@ import requests
 from datetime import datetime
 from rut_chile import rut_chile
 import io
+from mailer import enviar_confirmacion
 
 # Configuración básica
 st.set_page_config(page_title="Inscripción de Participantes", layout="wide")
@@ -611,7 +612,17 @@ try:
                         # Guardar registro
                         if guardar_registro(nuevo_registro):
                             st.write("Enviando registro:", nuevo_registro)
-                            st.success("✅ Registro guardado exitosamente")
+                            
+                            # Intentar enviar correo de confirmación (sin bloquear flujo)
+                            try:
+                                exito_correo = enviar_confirmacion(nuevo_registro, curso_actual)
+                                if exito_correo:
+                                    st.success("✅ ¡Registro exitoso! Se ha enviado un correo de confirmación.")
+                                else:
+                                    st.success("✅ Registro guardado. (No se pudo enviar el correo de confirmación)")
+                            except Exception:
+                                st.success("✅ Registro guardado exitosamente.")
+                                
                             st.balloons()
                             time.sleep(2)
                             st.rerun()
