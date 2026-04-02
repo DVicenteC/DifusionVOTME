@@ -259,7 +259,7 @@ class AsistenciaBuffer:
                     'curso_id': asistencia['curso_id'],
                     'rut': asistencia['rut'],
                     'sesion': asistencia['sesion'],
-                    'fecha_registro': asistencia['fecha_registro'].isoformat(),
+                    'fecha_registro': asistencia['fecha_registro'].strftime('%d-%m-%Y %H:%M:%S'),
                     'estado': asistencia['estado'],
                     'metodo': asistencia['metodo']
                 },

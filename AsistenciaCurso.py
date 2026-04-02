@@ -140,6 +140,21 @@ def get_asistencias_from_buffer(curso_id=None, sesion=None):
         return buffer.conn.execute("SELECT * FROM asistencias_buffer").df()
 
 # ==================== FUNCIONES AUXILIARES ====================
+def formato_fecha_dd_mm_yyyy(fecha):
+    """Convierte una fecha a formato dd-mm-yyyy para mostrar al usuario"""
+    if pd.isna(fecha):
+        return ""
+    try:
+        # Si ya es datetime/timestamp
+        if hasattr(fecha, 'strftime'):
+            return fecha.strftime('%d-%m-%Y')
+        # Si es un string ISO o similar
+        parsed = pd.to_datetime(str(fecha), errors='ignore')
+        if hasattr(parsed, 'strftime'):
+            return parsed.strftime('%d-%m-%Y')
+        return str(fecha)
+    except:
+        return str(fecha)
 
 def get_cursos_con_sesion_hoy(df_cursos):
     """
@@ -402,9 +417,11 @@ def main():
 
         @st.fragment
         def formulario_asistencia(curso_id, sesion_hoy, region, fecha_str):
-            with st.expander(f"📚 {curso_id}", expanded=True):
+            id_formateado = formato_fecha_dd_mm_yyyy(curso_id)
+            with st.expander(f"📚 {id_formateado}", expanded=True):
                 st.write(f"**Región:** {region}")
                 st.write(f"**Fecha:** {fecha_str}")
+                st.warning("⏰ **Nota:** La difusión TMERT comenzará a las **09:00 AM**.")
 
                 with st.form(key=f"form_{curso_id}_{sesion_hoy}", clear_on_submit=True):
                     rut_input = st.text_input(
@@ -548,8 +565,13 @@ def main():
                         st.metric("⏳ Pendientes", pendientes)
 
                     # Mostrar tabla
+                    # Formatear fecha_registro para visualización
+                    df_display = df_asist[['rut', 'estado', 'fecha_registro', 'sincronizado', 'intentos_sync']].copy()
+                    if 'fecha_registro' in df_display.columns:
+                        df_display['fecha_registro'] = pd.to_datetime(df_display['fecha_registro']).dt.strftime('%d-%m-%Y %H:%M:%S')
+                    
                     st.dataframe(
-                        df_asist[['rut', 'estado', 'fecha_registro', 'sincronizado', 'intentos_sync']],
+                        df_display,
                         use_container_width=True
                     )
 

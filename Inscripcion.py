@@ -454,9 +454,10 @@ try:
             # Crear lista de cursos con información útil
             opciones_cursos = []
             for _, curso in cursos_disponibles.iterrows():
-                # Formatear fecha para la lista
+                # Formatear ID y Jornada para la lista
+                id_formateado = formato_fecha_dd_mm_yyyy(curso['curso_id'])
                 f_jornada = formato_fecha_dd_mm_yyyy(curso.get('fecha_jornada', ''))
-                curso_info = f"{curso['curso_id']} (Jornada: {f_jornada})"
+                curso_info = f"{id_formateado} (Jornada: {f_jornada})"
                 opciones_cursos.append(curso_info)
 
             curso_seleccionado_info = st.selectbox(
@@ -471,7 +472,9 @@ try:
             curso_actual = cursos_disponibles.iloc[idx_curso].to_dict()
 
             # Mostrar información del curso seleccionado
-            st.info(f"**Curso seleccionado:** {curso_actual['curso_id']}")
+            id_seleccionado = formato_fecha_dd_mm_yyyy(curso_actual['curso_id'])
+            st.info(f"**Curso seleccionado:** {id_seleccionado}")
+            st.warning("⏰ **Nota:** Todas las difusiones TMERT se realizarán a las **09:00 AM**.")
             st.write(f"**Período:** {formato_fecha_dd_mm_yyyy(curso_actual['fecha_inicio'])} - {formato_fecha_dd_mm_yyyy(curso_actual['fecha_fin'])}")
 
             # Mostrar fecha de la jornada
@@ -588,7 +591,7 @@ try:
 
                         # Preparar nuevo registro
                         nuevo_registro = {
-                            'fecha_registro': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                            'fecha_registro': datetime.now().strftime('%d-%m-%Y %H:%M:%S'),
                             'curso_id': curso_actual['curso_id'],
                             'rut': rut_limpio,
                             'nombres': nombres,
