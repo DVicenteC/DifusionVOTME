@@ -611,20 +611,22 @@ try:
                         
                         # Guardar registro
                         if guardar_registro(nuevo_registro):
-                            st.write("Enviando registro:", nuevo_registro)
+                            st.write("✅ Enviando registro a la base de datos...")
                             
-                            # Intentar enviar correo de confirmación (sin bloquear flujo)
-                            try:
-                                exito_correo = enviar_confirmacion(nuevo_registro, curso_actual)
-                                if exito_correo:
-                                    st.success("✅ ¡Registro exitoso! Se ha enviado un correo de confirmación.")
-                                else:
-                                    st.success("✅ Registro guardado. (No se pudo enviar el correo de confirmación)")
-                            except Exception:
-                                st.success("✅ Registro guardado exitosamente.")
+                            # Intentar enviar correo de confirmación (sin bloquear flujo infinitamente)
+                            with st.spinner("📧 Generando y enviando correo de confirmación..."):
+                                try:
+                                    exito_correo = enviar_confirmacion(nuevo_registro, curso_actual)
+                                    if exito_correo:
+                                        st.success("✅ ¡Inscripción exitosa! Se ha enviado un correo de confirmación.")
+                                    else:
+                                        st.warning("⚠️ Registro guardado, pero no se pudo enviar el correo (tiempo agotado o error de servidor).")
+                                except Exception as e:
+                                    st.error(f"⚠️ Error al procesar el correo: {str(e)}")
+                                    st.info("Su registro ha sido guardado exitosamente en la planilla.")
                                 
                             st.balloons()
-                            time.sleep(2)
+                            time.sleep(1)
                             st.rerun()
 
     except Exception as e:

@@ -104,9 +104,13 @@ def enviar_confirmacion(datos_participante, curso_info):
     msg.attach(MIMEText(html_template, 'html'))
 
     try:
-        # Conexión al servidor
-        server = smtplib.SMTP(smtp_server, int(smtp_port))
-        server.starttls()  # Protocolo de seguridad
+        # Conexión al servidor (SSL para puerto 465) con timeout de 10s
+        if int(smtp_port) == 465:
+            server = smtplib.SMTP_SSL(smtp_server, int(smtp_port), timeout=10)
+        else:
+            server = smtplib.SMTP(smtp_server, int(smtp_port), timeout=10)
+            server.starttls()
+            
         server.login(smtp_user, smtp_password)
         server.send_message(msg)
         server.quit()
