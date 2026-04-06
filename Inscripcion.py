@@ -612,8 +612,14 @@ try:
                         # Guardar registro (Google Apps Script ahora envía el correo automáticamente)
                         if guardar_registro(nuevo_registro):
                             st.write("✅ Enviando registro a la base de datos...")
-                            st.success("✅ ¡Inscripción exitosa! Recibirás un correo de confirmación en unos minutos.")
-                            st.info("⏰ Recuerda: Todas las difusiones TMERT comenzarán a las **10:00 AM**.")
+                            st.success("✅ ¡Inscripción exitosa! Recibirás un correo de confirmación en unos minutos con los detalles.")
+                            st.markdown(f"""
+                            ### 🎥 Información de Conexión
+                            - **Horario:** 10:00 AM
+                            - **Plataforma:** Zoom
+                            - **Enlace:** [Unirse a la Difusión](https://us06web.zoom.us/j/85679954528)
+                            """)
+                            st.info("💡 Te recomendamos guardar este enlace o revisar tu correo electrónico.")
                                 
                             st.balloons()
                             time.sleep(1)
