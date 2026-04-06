@@ -44,73 +44,79 @@ def enviar_confirmacion(datos_participante, curso_info):
     if not email_destinatario:
         return False
 
-    # Crear el mensaje
-    msg = MIMEMultipart()
-    msg['From'] = f"{sender_name} <{smtp_user}>"
+    # Crear el mensaje (Multipart/Alternative para mejor compatibilidad)
+    msg = MIMEMultipart('alternative')
+    # Simplificar el From: algunos servidores corporativos rechazan el formato "Nombre <email>"
+    msg['From'] = smtp_user 
     msg['To'] = email_destinatario
     msg['Subject'] = f"Confirmación de Inscripción: Difusión TMERT V3 - {curso_id}"
+    
+    # Versión en Texto Plano (para evitar filtros de spam)
+    text_version = f"""
+    Estimado/a {nombre_completo},
+    
+    Le confirmamos que su inscripción para la jornada de difusión ha sido procesada con éxito.
+    
+    DETALLES:
+    - Curso: {curso_id}
+    - Fecha: {fecha_jornada}
+    - Horario: 09:00 AM
+    - Modalidad: Online
+    
+    Próximamente recibirá el enlace de conexión.
+    Atentamente, equipo de Difusión IST.
+    """
 
     # Plantilla HTML
     html_template = f"""
     <html>
     <head>
         <style>
-            .container {{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; color: #333; }}
-            .header {{ background-color: #004A99; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }}
-            .content {{ padding: 30px; border: 1px solid #ddd; border-top: none; background-color: #f9f9f9; }}
-            .details {{ background-color: white; padding: 20px; border-radius: 5px; margin-top: 20px; border-left: 5px solid #004A99; }}
-            .footer {{ text-align: center; font-size: 12px; color: #777; margin-top: 20px; }}
-            .highlight {{ color: #004A99; font-weight: bold; }}
-            .btn {{ display: inline-block; padding: 10px 20px; background-color: #004A99; color: white; text-decoration: none; border-radius: 5px; margin-top: 20px; }}
+            .container {{ font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #333; }}
+            .header {{ background-color: #004A99; color: white; padding: 15px; text-align: center; }}
+            .content {{ padding: 20px; border: 1px solid #ddd; }}
+            .footer {{ text-align: center; font-size: 11px; color: #999; margin-top: 15px; }}
         </style>
     </head>
     <body>
         <div class="container">
             <div class="header">
-                <h2>Confirmación de Inscripción</h2>
-                <p>Protocolo de Vigilancia TMERT V3</p>
+                <h2>Inscripción Confirmada</h2>
             </div>
             <div class="content">
-                <p>Estimado/a <span class="highlight">{nombre_completo}</span>,</p>
-                <p>Le confirmamos que su inscripción para la jornada de difusión ha sido procesada con éxito.</p>
-                
-                <div class="details">
-                    <p><strong>Curso:</strong> {curso_id}</p>
-                    <p><strong>Fecha de la Jornada:</strong> {fecha_jornada}</p>
-                    <p><strong>Horario:</strong> 09:00 AM</p>
-                    <p><strong>Modalidad:</strong> Online</p>
-                </div>
-                
-                <p>Próximamente recibirá el enlace de conexión a través de este mismo medio.</p>
-                
-                <p>Por favor, considere:</p>
+                <p>Hola <strong>{nombre_completo}</strong>,</p>
+                <p>Tu inscripción para <strong>{curso_id}</strong> ha sido registrada.</p>
                 <ul>
-                    <li>Conectarse 5 minutos antes del inicio.</li>
-                    <li>Asegurarse de contar con una buena conexión a internet.</li>
-                    <li>Tener su RUT a mano para el registro de asistencia.</li>
+                    <li><strong>Fecha:</strong> {fecha_jornada}</li>
+                    <li><strong>Hora:</strong> 09:00 AM</li>
+                    <li><strong>Modalidad:</strong> Online</li>
                 </ul>
-                
-                <p>Atentamente,<br><strong>Equipo de Difusión IST</strong></p>
+                <p>Nos vemos en la jornada.</p>
             </div>
             <div class="footer">
-                <p>Este es un correo automático, por favor no lo responda.</p>
-                <p>&copy; {datetime.now().year} IST - Especialidades Técnicas</p>
+                <p>IST - Especialidades Técnicas</p>
             </div>
         </div>
     </body>
     </html>
     """
 
+    msg.attach(MIMEText(text_version, 'plain'))
     msg.attach(MIMEText(html_template, 'html'))
 
     try:
-        # Conexión al servidor (SSL para puerto 465) con timeout de 10s
+        # Activar debug si es necesario
+        debug_level = 1 if __name__ == "__main__" else 0
+        
+        # Conexión al servidor (SSL para puerto 465)
         if int(smtp_port) == 465:
-            server = smtplib.SMTP_SSL(smtp_server, int(smtp_port), timeout=10)
+            server = smtplib.SMTP_SSL(smtp_server, int(smtp_port), timeout=15)
         else:
-            server = smtplib.SMTP(smtp_server, int(smtp_port), timeout=10)
+            server = smtplib.SMTP(smtp_server, int(smtp_port), timeout=15)
+            server.set_debuglevel(debug_level)
             server.starttls()
             
+        server.set_debuglevel(debug_level)
         server.login(smtp_user, smtp_password)
         server.send_message(msg)
         server.quit()
@@ -118,3 +124,73 @@ def enviar_confirmacion(datos_participante, curso_info):
     except Exception as e:
         print(f"Error al enviar correo: {str(e)}")
         return False
+
+# Bloque de prueba local
+if __name__ == "__main__":
+    print("🧪 Iniciando prueba local de envío de correos...")
+    
+    # Intentar cargar secretos manualmente para la prueba local
+    import os
+    import re
+    
+    class MockSecrets:
+        def __init__(self):
+            self.data = {"email": {}}
+            try:
+                # Buscar secrets.toml relativo a la ubicación del script
+                base_dir = os.path.dirname(os.path.abspath(__file__))
+                secrets_path = os.path.join(base_dir, ".streamlit", "secrets.toml")
+                
+                if os.path.exists(secrets_path):
+                    with open(secrets_path, "r") as f:
+                        content = f.read()
+                        # Simple regex para capturar campos de [email]
+                        for key in ["smtp_server", "smtp_port", "smtp_user", "smtp_password", "sender_name"]:
+                            # Buscar con comillas simples o dobles
+                            match = re.search(rf'{key}\s*=\s*["\'](.*?)["\']', content)
+                            if not match: # Caso para números (port)
+                                match = re.search(rf'{key}\s*=\s*(\d+)', content)
+                            
+                            if match:
+                                self.data["email"][key] = match.group(1)
+                else:
+                    print(f"⚠️ Archivo no encontrado en: {secrets_path}")
+            except Exception as e:
+                print(f"⚠️ No se pudo leer secrets.toml: {e}")
+
+        def get(self, key, default=None):
+            return self.data.get(key, default)
+
+    # Reemplazar st.secrets temporalmente para la prueba
+    original_secrets = st.secrets
+    st.secrets = MockSecrets()
+    
+    # Simular datos de entrada
+    test_participante = {
+        'nombres': 'DIEGO (TEST)',
+        'apellido_paterno': 'VICENTE',
+        'email': 'diergo.vicente@gmail.com' # Verifica que este correo sea el correcto para recibir
+    }
+    
+    test_curso = {
+        'curso_id': 'TEST-LOCAL-IST',
+        'fecha_jornada': '16-04-2026'
+    }
+    
+    # Intentar enviar con captura de error detallada
+    try:
+        print(f"Connecting to {st.secrets.get('email').get('smtp_server')}...")
+        resultado = enviar_confirmacion(test_participante, test_curso)
+        
+        if resultado:
+            print("\n✅ ¡ÉXITO! El correo fue aceptado por el servidor.")
+        else:
+            print("\n❌ FALLÓ el envío.")
+            print("Posibles causas:")
+            print("1. Credenciales incorrectas en secrets.toml")
+            print("2. El servidor mail.ist.cl NO acepta conexiones desde esta IP")
+            print("3. Firewall bloqueando el puerto 465")
+    except Exception as e:
+        print(f"\n❌ ERROR CRÍTICO: {e}")
+    finally:
+        st.secrets = original_secrets
