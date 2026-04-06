@@ -591,6 +591,9 @@ try:
                         rut_empresa_limpio = rut_chile.format_rut_without_dots(rut_empresa).upper()
 
                         # Preparar nuevo registro
+                        # Obtener enlace de Zoom de secretos
+                        zoom_link = st.secrets.get("email", {}).get("zoom_link", "https://ist.cl")
+                        
                         nuevo_registro = {
                             'fecha_registro': datetime.now().strftime('%d-%m-%Y %H:%M:%S'),
                             'curso_id': curso_actual['curso_id'],
@@ -606,7 +609,8 @@ try:
                             'razon_social': razon_social,
                             'region': region,
                             'comuna': comuna,
-                            'direccion': direccion
+                            'direccion': direccion,
+                            'zoom_link': zoom_link # Enviamos el link dinámico a Google
                         }
                         
                         # Guardar registro (Google Apps Script ahora envía el correo automáticamente)
@@ -617,7 +621,7 @@ try:
                             ### 🎥 Información de Conexión
                             - **Horario:** 10:00 AM
                             - **Plataforma:** Zoom
-                            - **Enlace:** [Unirse a la Difusión](https://us06web.zoom.us/j/85679954528)
+                            - **Enlace:** [Unirse a la Difusión]({zoom_link})
                             """)
                             st.info("💡 Te recomendamos guardar este enlace o revisar tu correo electrónico.")
                                 
