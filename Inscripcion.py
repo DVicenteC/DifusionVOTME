@@ -475,7 +475,7 @@ try:
             # Mostrar información del curso seleccionado
             id_seleccionado = formato_fecha_dd_mm_yyyy(curso_actual['curso_id'])
             st.info(f"**Curso seleccionado:** {id_seleccionado}")
-            st.warning("⏰ **Nota:** Todas las difusiones TMERT se realizarán a las **09:00 AM**.")
+            st.warning("⏰ **Nota:** Todas las difusiones TMERT se realizarán a las **10:00 AM**.")
             st.write(f"**Período:** {formato_fecha_dd_mm_yyyy(curso_actual['fecha_inicio'])} - {formato_fecha_dd_mm_yyyy(curso_actual['fecha_fin'])}")
 
             # Mostrar fecha de la jornada
