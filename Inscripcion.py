@@ -6,7 +6,7 @@ import requests
 from datetime import datetime
 from rut_chile import rut_chile
 import io
-from mailer import enviar_confirmacion
+# from mailer import enviar_confirmacion # Ya no es necesario, ahora lo hace Google Apps Script
 
 # Configuración básica
 st.set_page_config(page_title="Inscripción de Participantes", layout="wide")
@@ -609,25 +609,18 @@ try:
                             'direccion': direccion
                         }
                         
-                        # Guardar registro
+                        # Guardar registro (Google Apps Script ahora envía el correo automáticamente)
                         if guardar_registro(nuevo_registro):
                             st.write("✅ Enviando registro a la base de datos...")
-                            
-                            # Intentar enviar correo de confirmación (sin bloquear flujo infinitamente)
-                            with st.spinner("📧 Generando y enviando correo de confirmación..."):
-                                try:
-                                    exito_correo = enviar_confirmacion(nuevo_registro, curso_actual)
-                                    if exito_correo:
-                                        st.success("✅ ¡Inscripción exitosa! Se ha enviado un correo de confirmación.")
-                                    else:
-                                        st.warning("⚠️ Registro guardado, pero no se pudo enviar el correo (tiempo agotado o error de servidor).")
-                                except Exception as e:
-                                    st.error(f"⚠️ Error al procesar el correo: {str(e)}")
-                                    st.info("Su registro ha sido guardado exitosamente en la planilla.")
+                            st.success("✅ ¡Inscripción exitosa! Recibirás un correo de confirmación en unos minutos.")
+                            st.info("⏰ Recuerda: Todas las difusiones TMERT comenzarán a las **10:00 AM**.")
                                 
                             st.balloons()
                             time.sleep(1)
                             st.rerun()
+                            
+    except Exception as e:
+        st.error(f"Se produjo un error al procesar la inscripción: {e}")
 
     except Exception as e:
         st.error(f"Error al cargar cursos: {str(e)}")
