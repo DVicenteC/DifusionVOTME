@@ -592,7 +592,7 @@ try:
 
                         # Preparar nuevo registro
                         # Obtener enlace de Zoom de secretos
-                        zoom_link = st.secrets.get("email", {}).get("zoom_link", "https://ist.cl")
+                        zoom_link = st.secrets.get("email", {}).get("zoom_link", "https://us06web.zoom.us/j/85679954528")
                         
                         nuevo_registro = {
                             'fecha_registro': datetime.now().strftime('%d-%m-%Y %H:%M:%S'),
