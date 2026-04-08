@@ -510,7 +510,7 @@ try:
             st.subheader("2. Complete sus datos")
 
             # Región y comuna del participante (puede ser diferente a la del curso)
-            st.write("**Datos de ubicación del participante:**")
+            st.write("**Datos de ubicación del centro de trabajo del participante:**")
 
             # Inicializar comunas en la primera carga si no existen
             if 'comunas' not in st.session_state or not st.session_state.comunas:
@@ -520,8 +520,8 @@ try:
                         st.session_state.comunas = reg["comunas"]
                         break
 
-            region = st.selectbox("Región del participante (*)", regiones, key='region', on_change=update_comunas_state)
-            comuna = st.selectbox("Comuna (*)", st.session_state.get('comunas', []), key='comuna')
+            region = st.selectbox("Región del centro de trabajo del participante (*)", regiones, key='region', on_change=update_comunas_state)
+            comuna = st.selectbox("Comuna del centro de trabajo del participante (*)", st.session_state.get('comunas', []), key='comuna')
 
             with st.form("registro_form"):
                 col1, col2 = st.columns(2)
@@ -545,7 +545,7 @@ try:
                     razon_social = st.text_input("Razón Social (*)").upper()
         
                 with col4:
-                    direccion = st.text_input("Dirección (*)").upper()
+                    direccion = st.text_input("Dirección del centro de trabajo del participante (*)").upper()
                 
                 if st.form_submit_button("Enviar"):
                     # Verificar nuevamente los cupos disponibles
