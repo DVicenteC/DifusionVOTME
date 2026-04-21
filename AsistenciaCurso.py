@@ -245,16 +245,7 @@ def get_cursos_con_sesion_hoy(df_cursos):
                 cursos_hoy.append(curso_dict)
                 encontrado = True
 
-        # 2. Verificar hoy vs fecha_jornada (SESIÓN ÚNICA)
-        if 'fecha_jornada' in curso and pd.notna(curso['fecha_jornada']):
-            if pd.to_datetime(curso['fecha_jornada']).date() == hoy_d:
-                curso_dict = curso.to_dict()
-                curso_dict['sesion_hoy'] = 1
-                curso_dict['fecha_sesion_hoy'] = curso['fecha_jornada']
-                cursos_hoy.append(curso_dict)
-                encontrado = True
-
-        # 3. Fallback: hoy está dentro del rango fecha_inicio – fecha_fin
+        # 2. Fallback: hoy está dentro del rango fecha_inicio – fecha_fin
         if not encontrado:
             inicio = curso.get('fecha_inicio')
             fin = curso.get('fecha_fin')
