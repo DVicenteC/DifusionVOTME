@@ -137,6 +137,48 @@ def guardar_asistencia_buffer(curso_id, rut, sesion):
 
     return resultado
 
+@st.fragment
+def formulario_asistencia(curso_id, sesion_hoy, region, fecha_str):
+    from rut_chile import rut_chile as _rut_chile
+    id_formateado = formato_fecha_dd_mm_yyyy(curso_id)
+    with st.expander(f"📚 {id_formateado}", expanded=True):
+        st.write(f"**Región:** {region}")
+        st.write(f"**Fecha:** {fecha_str}")
+        st.warning("⏰ **Nota:** La difusión TMERT comenzará a las **10:00 AM**.")
+
+        with st.form(key=f"form_{curso_id}_{sesion_hoy}", clear_on_submit=True):
+            rut_input = st.text_input(
+                "Ingresa tu RUT (sin puntos, con guión)",
+                placeholder="12345678-9"
+            )
+            submit = st.form_submit_button("✅ Marcar Asistencia")
+
+            if submit and rut_input:
+                rut_input = rut_input.strip().upper()
+                if not _rut_chile.is_valid_rut(rut_input):
+                    st.error("❌ RUT inválido. Verifica el formato.")
+                else:
+                    df_registros = get_registros_data()
+                    esta_inscrito, datos = validar_participante_inscrito(
+                        rut_input, curso_id, df_registros
+                    )
+                    if not esta_inscrito:
+                        st.error("❌ No estás inscrito en este curso. Contacta al administrador.")
+                    else:
+                        resultado = guardar_asistencia_buffer(
+                            curso_id=curso_id,
+                            rut=rut_input,
+                            sesion=sesion_hoy
+                        )
+                        if resultado['success']:
+                            nombre_completo = f"{datos.get('nombres', '')} {datos.get('apellido_paterno', '')}".strip() or rut_input
+                            st.success(f"✅ ¡Asistencia registrada para {nombre_completo}!")
+                            st.info("🎉 Ya puedes cerrar esta pestaña.")
+                            st.balloons()
+                        else:
+                            st.warning(f"ℹ️ {resultado['message']}")
+
+
 def get_asistencias_from_buffer(curso_id=None, sesion=None):
     """
     Obtiene asistencias desde el buffer local (instantáneo).
@@ -440,50 +482,6 @@ def main():
 
         # Mostrar cursos disponibles
         st.subheader("📅 Cursos con Sesión Hoy")
-
-        @st.fragment
-        def formulario_asistencia(curso_id, sesion_hoy, region, fecha_str):
-            id_formateado = formato_fecha_dd_mm_yyyy(curso_id)
-            with st.expander(f"📚 {id_formateado}", expanded=True):
-                st.write(f"**Región:** {region}")
-                st.write(f"**Fecha:** {fecha_str}")
-                st.warning("⏰ **Nota:** La difusión TMERT comenzará a las **09:00 AM**.")
-
-                with st.form(key=f"form_{curso_id}_{sesion_hoy}", clear_on_submit=True):
-                    rut_input = st.text_input(
-                        "Ingresa tu RUT (sin puntos, con guión)",
-                        placeholder="12345678-9"
-                    )
-
-                    submit = st.form_submit_button("✅ Marcar Asistencia")
-
-                    if submit and rut_input:
-                        rut_input = rut_input.strip().upper()
-
-                        if not rut_chile.is_valid_rut(rut_input):
-                            st.error("❌ RUT inválido. Verifica el formato.")
-                        else:
-                            df_registros = get_registros_data()
-                            esta_inscrito, datos = validar_participante_inscrito(
-                                rut_input, curso_id, df_registros
-                            )
-
-                            if not esta_inscrito:
-                                st.error("❌ No estás inscrito en este curso. Contacta al administrador.")
-                            else:
-                                resultado = guardar_asistencia_buffer(
-                                    curso_id=curso_id,
-                                    rut=rut_input,
-                                    sesion=sesion_hoy
-                                )
-
-                                if resultado['success']:
-                                    nombre_completo = f"{datos.get('nombres', '')} {datos.get('apellido_paterno', '')}".strip() or rut_input
-                                    st.success(f"✅ ¡Asistencia registrada para {nombre_completo}!")
-                                    st.info("🎉 Ya puedes cerrar esta pestaña.")
-                                    st.balloons()
-                                else:
-                                    st.warning(f"ℹ️ {resultado['message']}")
 
         for _, curso in df_cursos_hoy.iterrows():
             formulario_asistencia(
