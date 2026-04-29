@@ -417,7 +417,7 @@ try:
 
     # Mostrar formulario de inscripción
     try:
-        st.title("Inscripción Jornada de Difusión del PROTOCOLO DE VIGILANCIA OCUPACIONAL POR EXPOSICIÓN A FACTORES DE RIESGO DE TRASTORNOS MUSCULOESQUELÉTICOS V3")
+        st.title("Registro de asistencia capacitación en Vigilancia de la Salud - Gerencia de Salud Ocupacional")
 
         # Obtener todos los cursos
         df_cursos = get_config_data()
