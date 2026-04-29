@@ -313,7 +313,8 @@ def generar_excel_ist(df):
     ws.title = "Campos inscripción ISTeduca"
     headers = ["RUT trabajador (Sin puntos ni dv)", "DV", "Nombres", "Apellidos (ambos)",
                "Email (individual)", "Género", "Rol trabajador", "Región", "Comuna",
-               "Rut empresa (Sin puntos, con guión)", "Razón social"]
+               "Rut empresa (Sin puntos, con guión)", "Razón social",
+               "ID-CT", "NUM SUC", "Nombre Sucursal"]
     hf = Font(name="Arial", bold=True, color="FFFFFF", size=10)
     hfill = PatternFill("solid", fgColor="1F4E79")
     thin = Side(style='thin', color="AAAAAA")
@@ -324,7 +325,7 @@ def generar_excel_ist(df):
         cell.alignment = Alignment(horizontal="center", wrap_text=True)
         cell.border = brd
     ws.row_dimensions[1].height = 30
-    for c, w in enumerate([22,6,25,30,30,10,25,30,25,28,35], 1):
+    for c, w in enumerate([22,6,25,30,30,10,25,30,25,28,35,12,12,35], 1):
         ws.column_dimensions[ws.cell(row=1, column=c).column_letter].width = w
     df_ = Font(name="Arial", size=10)
     for ri, row in enumerate(df.itertuples(index=False), 2):
@@ -333,7 +334,8 @@ def generar_excel_ist(df):
         for c, v in enumerate([rb, dv, getattr(row,'nombres',''), ap,
             getattr(row,'email',''), getattr(row,'sexo',''), getattr(row,'rol',''),
             getattr(row,'region',''), getattr(row,'comuna',''),
-            getattr(row,'rut_empresa',''), getattr(row,'razon_social','')], 1):
+            getattr(row,'rut_empresa',''), getattr(row,'razon_social',''),
+            getattr(row,'id_ct',''), getattr(row,'num_suc',''), getattr(row,'nom_suc','')], 1):
             cell = ws.cell(row=ri, column=c, value=v)
             cell.font = df_; cell.border = brd
     buf = io.BytesIO(); wb.save(buf); buf.seek(0)
@@ -385,6 +387,21 @@ def generar_excel_mk(df, fecha_sesion=None):
                       (3,"Miembro Comité Paritario"),(4,"Monitor o Delegado"),(5,"Dirigente Sindical")])]:
         ws2 = wb.create_sheet(sh)
         for r in rows: ws2.append(r)
+
+    # Hoja extra: trazabilidad de centros de trabajo (no afecta carga MK)
+    ws_ct = wb.create_sheet("Centro_Trabajo")
+    ct_headers = ["Rut", "ID-CT", "NUM SUC", "Nombre Sucursal", "Comuna Sucursal", "Suc Resuelta"]
+    for c, h in enumerate(ct_headers, 1):
+        cell = ws_ct.cell(row=1, column=c, value=h); cell.font = hf; cell.fill = hfill
+        cell.alignment = Alignment(horizontal="center"); cell.border = brd
+    for ri, row in enumerate(df.itertuples(index=False), 2):
+        for c, v in enumerate([getattr(row,'rut',''), getattr(row,'id_ct',''),
+                                getattr(row,'num_suc',''), getattr(row,'nom_suc',''),
+                                getattr(row,'comuna_suc',''), getattr(row,'suc_resuelta','')], 1):
+            cell = ws_ct.cell(row=ri, column=c, value=v); cell.font = df_; cell.border = brd
+    for c, w in enumerate([18, 12, 12, 35, 25, 14], 1):
+        ws_ct.column_dimensions[ws_ct.cell(row=1, column=c).column_letter].width = w
+
     buf = io.BytesIO(); wb.save(buf); buf.seek(0)
     return buf
 
