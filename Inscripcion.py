@@ -52,7 +52,7 @@ def load_maestro() -> pl.DataFrame:
             'C.GLS_NOM_SUC', 'Dirección Suc', 'Comuna Sucursal',
             'Region Sucursal', 'Est Sucursal', 'Tipo suc']
     df = df.select([c for c in cols if c in df.columns])
-    return df.filter(pl.col('Est Sucursal') == 'Si') if 'Est Sucursal' in df.columns else df
+    return df.filter(pl.col('Est Sucursal') == 'Activa') if 'Est Sucursal' in df.columns else df
 
 def _norm_rut(r: str) -> str:
     try: return rut_chile.format_rut_without_dots(str(r)).upper().strip()
