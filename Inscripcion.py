@@ -471,7 +471,7 @@ try:
 
     # Mostrar formulario de inscripción
     try:
-        st.title("Registro de asistencia capacitación en Vigilancia de la Salud - Gerencia de Salud Ocupacional")
+        st.title("Registro de asistencia Capacitación Interna IST - Protocolo Psicosocial (CEAL)")
 
         # Obtener todos los cursos
         df_cursos = get_config_data()
