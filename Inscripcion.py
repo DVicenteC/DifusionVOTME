@@ -36,7 +36,9 @@ def load_maestro() -> pl.DataFrame:
         try:
             sess = requests.Session()
             resp = sess.get(MAESTRO_URL, timeout=60, allow_redirects=True)
-            if 'text/html' in resp.headers.get('Content-Type', ''):
+            ctype = resp.headers.get('Content-Type', '')
+            if 'text/html' in ctype:
+                st.error(f"Drive devolvió HTML (Content-Type: {ctype}). Revisa permisos públicos del archivo.")
                 return pl.DataFrame()
             resp.raise_for_status()
             df = pl.read_parquet(io.BytesIO(resp.content))
@@ -44,6 +46,7 @@ def load_maestro() -> pl.DataFrame:
             st.error(f"Error al descargar maestro: {e}")
             return pl.DataFrame()
     else:
+        st.error("MAESTRO_URL no está configurada en los secrets.")
         return pl.DataFrame()
     cols = ['Rut Empresa', 'Razón Social', 'ID-CT', 'NUM SUC',
             'C.GLS_NOM_SUC', 'Dirección Suc', 'Comuna Sucursal',
@@ -280,6 +283,7 @@ try:
     # Botón para limpiar cache (útil cuando hay actualizaciones)
     if st.sidebar.button("🔄 Actualizar Datos"):
         st.cache_data.clear()
+        st.cache_resource.clear()
         st.sidebar.success("✅ Cache limpiado. Datos actualizados.")
         st.rerun()
 
