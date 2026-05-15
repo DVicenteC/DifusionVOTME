@@ -122,16 +122,15 @@ def get_config_data():
 @st.cache_data(ttl=180)  # Cache por 3 minutos (se actualiza más frecuentemente)
 def get_registros_data():
     try:
-        response = requests.get(f"{API_URL}?action=getRegistros&key={API_KEY}")
-        data = response.json()
-        
-        if data['success']:
-            return pd.DataFrame(data['registros'])
-        else:
-            st.error(f"Error al obtener registros: {data.get('error', 'Error desconocido')}")
+        response = requests.get(f"{API_URL}?action=getRegistros&key={API_KEY}", timeout=15)
+        try:
+            data = response.json()
+        except Exception:
             return pd.DataFrame()
-    except Exception as e:
-        st.error(f"Error al conectar con la API: {str(e)}")
+        if data.get('success'):
+            return pd.DataFrame(data.get('registros', []))
+        return pd.DataFrame()
+    except Exception:
         return pd.DataFrame()
 
 # Función para activar un curso
