@@ -30,6 +30,8 @@ def _rut_valido(rut_str):
 
 @st.cache_resource(show_spinner="Cargando maestro de adherentes…")
 def load_maestro() -> pl.DataFrame:
+    # DEBUG: visibilidad de qué está pasando en deploy
+    st.info(f"DEBUG load_maestro — local existe: {MAESTRO_LOCAL_PATH.exists()} · MAESTRO_URL host: {(MAESTRO_URL or 'NONE')[:60]}…")
     if MAESTRO_LOCAL_PATH.exists():
         df = pl.read_parquet(MAESTRO_LOCAL_PATH)
     elif MAESTRO_URL:
@@ -37,6 +39,7 @@ def load_maestro() -> pl.DataFrame:
             sess = requests.Session()
             resp = sess.get(MAESTRO_URL, timeout=60, allow_redirects=True)
             ctype = resp.headers.get('Content-Type', '')
+            st.info(f"DEBUG respuesta — HTTP {resp.status_code} · Content-Type: {ctype} · bytes: {len(resp.content)}")
             if 'text/html' in ctype:
                 st.error(f"Drive devolvió HTML (Content-Type: {ctype}). Revisa permisos públicos del archivo.")
                 return pl.DataFrame()
