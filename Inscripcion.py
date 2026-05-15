@@ -471,7 +471,7 @@ try:
 
     # Mostrar formulario de inscripción
     try:
-        st.title("Registro de asistencia Capacitación Interna IST - Protocolo Psicosocial (CEAL)")
+        st.title("Registro de asistencia Capacitación Interna IST - Protocolo Psicosocial (CEAL) - Prevención de Suicidio – 11:15 a 13:15 pm.")
 
         # Obtener todos los cursos
         df_cursos = get_config_data()
