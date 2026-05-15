@@ -35,16 +35,13 @@ def load_maestro() -> pl.DataFrame:
     elif MAESTRO_URL:
         try:
             sess = requests.Session()
-            resp = sess.get(MAESTRO_URL, stream=True, timeout=30)
+            resp = sess.get(MAESTRO_URL, timeout=60, allow_redirects=True)
             if 'text/html' in resp.headers.get('Content-Type', ''):
-                import re as _re
-                m = _re.search(r'confirm=([0-9A-Za-z_-]+)', resp.text)
-                if m:
-                    resp = sess.get(f"{MAESTRO_URL}&confirm={m.group(1)}", stream=True, timeout=60)
+                return pl.DataFrame()
             resp.raise_for_status()
             df = pl.read_parquet(io.BytesIO(resp.content))
         except Exception as e:
-            st.error(f"Error al descargar maestro desde URL: {e}")
+            st.error(f"Error al descargar maestro: {e}")
             return pl.DataFrame()
     else:
         return pl.DataFrame()
