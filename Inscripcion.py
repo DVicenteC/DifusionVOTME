@@ -19,7 +19,7 @@ MAESTRO_LOCAL_PATH = Path(__file__).parent / "maestro_adherentes.parquet"
 SECRET_PASSWORD = st.secrets["SECRET_PASSWORD"]
 API_URL = st.secrets["API_URL"]  # URL del Apps Script publicado como aplicación web
 API_KEY = st.secrets["API_KEY"]  # Clave API configurada en el Apps Script
-MAESTRO_URL = st.secrets.get("MAESTRO_URL", None)
+MAESTRO_URL = st.secrets.get("MAESTRO_URL", None) or "https://drive.usercontent.google.com/download?id=1Qgo-AcKDGm7_p3qxxQ5NqsR9sTULufxb&export=download&confirm=t"
 
 def _rut_valido(rut_str):
     """Valida RUT sin lanzar excepción para entradas no numéricas."""
