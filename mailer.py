@@ -26,7 +26,7 @@ def enviar_confirmacion(datos_participante, curso_info):
         smtp_port = email_config.get("smtp_port")
         smtp_user = email_config.get("smtp_user")
         smtp_password = email_config.get("smtp_password")
-        sender_name = email_config.get("sender_name", "Difusión TMERT V3")
+        sender_name = email_config.get("sender_name", "Agentes Químicos")
         
         if not all([smtp_server, smtp_port, smtp_user, smtp_password]):
             return False
@@ -49,7 +49,7 @@ def enviar_confirmacion(datos_participante, curso_info):
     # Simplificar el From: algunos servidores corporativos rechazan el formato "Nombre <email>"
     msg['From'] = smtp_user 
     msg['To'] = email_destinatario
-    msg['Subject'] = f"Confirmación de Inscripción: Difusión TMERT V3 - {curso_id}"
+    msg['Subject'] = f"Confirmación de Inscripción: Agentes Químicos - {curso_id}"
     
     # Versión en Texto Plano (para evitar filtros de spam)
     text_version = f"""
@@ -60,10 +60,11 @@ def enviar_confirmacion(datos_participante, curso_info):
     DETALLES:
     - Curso: {curso_id}
     - Fecha: {fecha_jornada}
-    - Horario: 09:00 AM
+    - Horario: 11:30 AM
     - Modalidad: Online
     
-    Próximamente recibirá el enlace de conexión.
+    Enlace de conexión: https://us06web.zoom.us/j/83729263213?pwd=1KEgfmvcXh6QrDF7CCkPVFXHFmKdrn.1 
+
     Atentamente, equipo de Difusión IST.
     """
 
