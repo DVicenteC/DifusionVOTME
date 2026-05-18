@@ -471,11 +471,7 @@ try:
 
     # Mostrar formulario de inscripción
     try:
-<<<<<<< HEAD
         st.title("Registro de asistencia Capacitación Interna IST - Agentes Químicos – 11:15 a 13:00 pm.")
-=======
-        st.title("Registro de asistencia Capacitación Interna IST - Protocolo de Metales y Metaloides – 09:00 am")
->>>>>>> 358aa8fac3aee8da84c70572117ec0372a31b318
 
         # Obtener todos los cursos
         df_cursos = get_config_data()
