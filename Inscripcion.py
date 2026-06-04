@@ -471,7 +471,7 @@ try:
 
     # Mostrar formulario de inscripción
     try:
-        st.title("Registro de asistencia Capacitación Interna IST - Plaguicidas (09:00-11:00) / Árbol de Causas (11:15-13:00 pm.")
+        st.title("Inscripción a Difusión de la Actualización del Protocolo de Vigilancia TMERT Versión N° 3 - 19 Junio 2026")
 
         # Obtener todos los cursos
         df_cursos = get_config_data()
