@@ -52,7 +52,11 @@ def load_maestro() -> pl.DataFrame:
             'C.GLS_NOM_SUC', 'Dirección Suc', 'Comuna Sucursal',
             'Region Sucursal', 'Est Sucursal', 'Tipo suc']
     df = df.select([c for c in cols if c in df.columns])
-    return df.filter(pl.col('Est Sucursal') == 'Activa') if 'Est Sucursal' in df.columns else df
+    # A propósito NO se filtra por 'Est Sucursal'. El maestro de adherentes va
+    # atrasado respecto a la realidad -un CT puede reabrirse, o pasar de pasivo
+    # a activo, antes de que el maestro lo refleje- y filtrar dejaba fuera
+    # inscripciones legítimas. Se muestran todos los centros de trabajo.
+    return df
 
 def _norm_rut(r: str) -> str:
     try: return rut_chile.format_rut_without_dots(str(r)).upper().strip()
@@ -471,7 +475,7 @@ try:
 
     # Mostrar formulario de inscripción
     try:
-        st.title("Inscripción a Difusión de la Actualización del Protocolo de Vigilancia TMERT Versión N° 3 - 19 Junio 2026")
+        st.title("Capacitación Nacional Plataforma SIGECO - Evaluación Cualitativa Sílice - Cualitativa Plaguicidas ")
 
         # Obtener todos los cursos
         df_cursos = get_config_data()
